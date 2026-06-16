@@ -29,7 +29,9 @@
 **How it compounds:** Direct effect via reviews is real but limited. Indirect instructor-side effect is weaker than platforms like LinkedIn. 
 
 **Total Flywheel Score: 11/20**
+
 **Weakest Loop:Domain Context (2/5)**
+
 **Fix for weakest loop:** Focus on building strong conversion pattern recognition within each sport vertical first (surf, yoga, skate separately) before attempting cross-domain transfer. Cross-sport learning is a later-stage bet, not a foundational one.
 
 
