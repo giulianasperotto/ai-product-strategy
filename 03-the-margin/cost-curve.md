@@ -4,27 +4,27 @@
 
 | Cost Category | Per-User/Month | Notes |
 |--------------|----------------|-------|
-| Inference (primary model) | $0.009 | Profile generation only — Simple complexity, Small-tier model (e.g. Gemini Flash, Claude Haiku). 3 requests/month average. |
-| Inference (cascading/triage) | N/A | Not applicable — single AI feature, no triage/frontier split yet |
-| Infrastructure | Negligible | Lightweight feature, no dedicated infra beyond existing app backend |
-| Data/storage | Negligible | Text-only outputs (bio, headline, highlights); no media storage for AI outputs |
+| Inference (primary model) | $0.009 | Profile generation — Simple complexity, Small-tier model (e.g. Gemini Flash, Claude Haiku). 3 requests/month average, applies to all instructors. |
+| Inference (cascading/triage) | $0 (Free) / ~$2–4 (Premium) | Scheduling agent — Medium/Complex task (multi-step: read calendar, draft message, confirm action), Mid-tier model. Only active for Premium instructors, capped usage per month. |
+| Infrastructure | Negligible | Lightweight features, no dedicated infra beyond existing app backend |
+| Data/storage | Negligible | Text-only AI outputs; no media storage for AI-generated content |
 | Human-in-the-loop | $0 | No human review step in current flow; regenerate/edit/feedback are self-serve |
-| **Total AI COGS** | **$0.009** | |
+| **Total AI COGS** | **$0.009 (Free) / ~$2–4 (Premium)** | Blended cost depends on plan — Free instructors only use profile generation; Premium instructors add scheduling agent cost |
 
 ## Cascading Strategy
 <!-- Cheap model → frontier model routing logic -->
-**Triage model:** Not applicable yet — WaveUp has a single AI feature (profile generation), classified as Simple complexity, fully served by a Small-tier model.
+**Triage model:** Small-tier model (e.g. Gemini Flash, Claude Haiku) — handles profile generation for all instructors, and simple scheduling agent actions (e.g. confirming a fixed time slot) for Premium instructors.
 
-**Frontier model:** Not applicable yet — no task today requires frontier-level reasoning. Would become relevant if the scheduling agent (under consideration as a premium add-on) is built, since it likely requires more complex, multi-step reasoning.
+**Frontier/Mid model:** Mid-tier model — handles scheduling agent tasks requiring more context or judgment (e.g. drafting a personalized message to a student, handling a rescheduling conflict).
 
-**Routing rule:** N/A — revisit once a second, more complex AI feature exists.
+**Routing rule:** Profile generation always routes to the Small-tier model. Scheduling agent actions route to Small-tier for templated/simple actions; escalate to Mid-tier when the action requires reading conversation context or resolving a conflict.
 
-**Expected cascade ratio:** N/A
+**Expected cascade ratio:** ~80% Small-tier / 20% Mid-tier for scheduling agent actions — most actions (confirmations, reminders) are simple; a minority (conflict resolution, custom messages) need more reasoning.
 
 ## Pricing Model
 **Current pricing:** None — prototype stage, no live transactions.
 
-**Proposed AI pricing:** Hybrid model. All instructors pay commission on bookings; a premium subscription tier unlocks a reduced commission rate plus access to a scheduling agent (capped usage, overage billed separately).
+**Proposed AI pricing:** Hybrid model. All instructors pay commission on bookings; a premium subscription tier unlocks a reduced commission rate plus access to the scheduling agent (capped usage, overage billed separately).
 
 - Free plan: 15% commission per booking, AI profile generation included, no scheduling agent
 - Premium plan ($19/month flat fee): 8% commission per booking, AI profile generation included, scheduling agent included with monthly action cap
@@ -35,9 +35,9 @@
 
 | Scenario | Impact on Margin | Response |
 |----------|-----------------|----------|
-| Inference costs 3x | Minimal — blended cost per user rises from $0.009 to $0.081/month. Revenue is commission-based, not AI-usage-based, so gross margin stays above 99%. | No action needed at current scale; monitor if AI feature set expands to heavier tasks (e.g. scheduling agent). |
-| Heaviest segment doubles | If high-volume (Premium) instructors double, scheduling agent usage doubles — the only cost-sensitive feature. Commission revenue also doubles, offsetting most of the cost increase. | Enforce the monthly action cap on the scheduling agent and bill overage to protect margin on the heaviest users. |
-| Model provider raises prices 50% | Profile generation cost rises from $0.009 to ~$0.0135/user/month — still negligible against $32–$150/month in commission revenue. | Switch providers behind the abstraction layer (see Kill Switch, Module 2) if the increase persists or extends to future features. |
+| Inference costs 3x | Free plan: negligible, COGS rises from $0.009 to $0.081/month. Premium plan: more material, scheduling agent COGS could rise from ~$3 to ~$9/month — still well below the $19 flat fee plus commission revenue. | Monitor Premium plan margin closely since it carries the cascading cost; Free plan has no exposure to worry about. |
+| Heaviest segment doubles | If Premium instructor count doubles, scheduling agent costs double in aggregate. Commission and subscription revenue also double, largely offsetting the cost increase. | Enforce the monthly action cap and bill overage on the scheduling agent to prevent the heaviest users from eroding Premium margin. |
+| Model provider raises prices 50% | Free plan: cost rises from $0.009 to ~$0.0135/month, immaterial. Premium plan: scheduling agent cost could rise from ~$3 to ~$4.50/month, still small relative to $19 + commission revenue. | Switch providers behind the abstraction layer (see Kill Switch, Module 2) if the increase persists. |
 
 ## Board One-Pager
 <!-- Before/After: Old SaaS revenue vs. AI usage revenue for your product -->
@@ -45,7 +45,7 @@
 A flat-commission marketplace (15% per booking) with no AI differentiation. Revenue scales only with transaction volume; instructor profiles are static and manually filled, contributing to the 8% browse-to-booking conversion rate and 61% zero-review instructor rate identified in the Module 1 diagnostic.
 
 **After (AI-enabled):**
-AI profile generation is bundled into the base plan (Filler) to lift conversion at near-zero cost (<$0.01/user/month). A premium tier introduces a reduced commission rate (8%) plus a paid scheduling agent (Killer), creating a retention lever for high-volume instructors who have the strongest incentive to leak transactions off-platform.
+Two AI features now shape the business: profile generation (Filler), bundled free for all instructors to lift conversion at near-zero cost; and a scheduling agent (Killer), sold as a Premium add-on with a reduced commission rate, creating a retention lever for high-volume instructors who have the strongest incentive to leak transactions off-platform.
 
 **Net margin shift:**
-Gross margin remains above 99% even under a pessimistic 3x stress test, because AI costs are immaterial relative to commission revenue. The real margin risk isn't inference cost — it's off-platform leakage, which the premium tier is designed to mitigate by making it cheaper to stay on WaveUp than to transact outside it.
+Free plan margin remains above 99% even under stress, since profile generation cost is immaterial. Premium plan margin is more sensitive to inference cost because the scheduling agent is a heavier, multi-step task — but it remains healthy because the $19 flat fee and commission revenue comfortably cover even a 3x cost increase. The real margin risk isn't inference cost on either plan — it's off-platform leakage, which the Premium tier is designed to mitigate.
